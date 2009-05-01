@@ -15,7 +15,7 @@ dojo.declare('aiki.EditorManager', null, {
     dojo.subscribe(this.container.id + '-removeChild', this, 'editorClosed');
   },
 
-  edit: function(object, store, widgetType, /* Object? */options) {
+  editObject: function(object, store, widgetType, /* Object? */options) {
     options = options || {};
     if (dojo.isString(object)) {
       store.fetchItemByIdentity({
@@ -28,7 +28,7 @@ dojo.declare('aiki.EditorManager', null, {
     }
   },
 
-  new: function(store, widgetType, options) {
+  newObject: function(store, widgetType, options) {
     this._edit(null, store, widgetType, options || {});
   },
 
