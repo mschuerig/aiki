@@ -59,15 +59,17 @@ dojo.declare('aiki.form._DataMixin', null, {
   },
 
   isModified: function() {
-    if (!this.object) {
-      return false;
-    }
+    var store = this.store, object = this.object;
+    var originalValue = this.object ?
+      function(prop) { return store.getValue(object, prop); }
+      : function(prop) { return null; };
+
     var modified = false;
     var values = this.attr('value');
     for (prop in values) {
       if (!modified || dojo.config.isDebug) {
         var propModified;
-        var orig = this.store.getValue(this.object, prop) || '';
+        var orig = originalValue(prop) || '';
         var cur = values[prop] || ''; //### TODO is '' ever used?
         if (orig instanceof Date || cur instanceof Date) {
           propModified = (dojo.date.compare(orig, cur) !== 0);
