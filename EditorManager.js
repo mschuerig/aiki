@@ -17,32 +17,33 @@ dojo.declare('aiki.EditorManager', null, {
 
   editObject: function(object, store, widgetType, /* Object? */options) {
     options = options || {};
+    var whenReady = new dojo.Deferred();
     if (dojo.isString(object)) {
       store.fetchItemByIdentity({
         identity: object,
         scope: this,
-        onItem: function(item) { this._edit(item, store, widgetType, options); }
+        onItem: function(item) { this._edit(item, store, widgetType, whenReady, options); }
       });
     } else {
-      this._edit(object, store, widgetType, options);
+      this._edit(object, store, widgetType, whenReady, options);
     }
+    return whenReady;
   },
 
   newObject: function(store, widgetType, options) {
-    this._edit(null, store, widgetType, options || {});
+    var whenReady = new dojo.Deferred();
+    this._edit(null, store, widgetType, whenReady, options || {});
+    return whenReady;
   },
 
-  _edit: function(object, store, widgetType, options) {
+  _edit: function(object, store, widgetType, whenReady, options) {
     var editor = this._editorForObject(object);
     if (!editor) {
       editor = this._makeEditor(object, store, widgetType, options);
-      this.selectEditor(editor);
-    } else {
-      this.selectEditor(editor);
-      if (options.onReady) {
-        options.onReady(editor.widget, editor.object);
-      }
     }
+    this.selectEditor(editor);
+    whenReady.callback(editor);
+
     return editor.widget;
   },
 
@@ -62,10 +63,6 @@ dojo.declare('aiki.EditorManager', null, {
     widgetType = dojo.isString(widgetType) ? dojo.getObject(widgetType) : widgetType;
     var widget = new widgetType(dojo.mixin(options,
       { store: store, object: object }));
-
-    if (options.onReady) {
-      dojo.connect(widget, 'startup', dojo.partial(options.onReady, widget, object));
-    }
 
     widget = dojo.mixin(widget, {
       showLabel: true,
