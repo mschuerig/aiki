@@ -31,10 +31,16 @@ dojo.provide('aiki._base');
      return { keys: keys, groups: groups };
    };
 
-   a.relay = function(/*Object*/source, /*Object*/dest /*, String ... */) {
+   a.relay = function(/*Object*/source, /*Object*/dest /*, String|Array ... */) {
      for (var i = 2, l = arguments.length; i < l; i++) {
        var event = arguments[i];
-       dojo.connect(source, event, dest, event);
+       if (dojo.isString(event)) {
+         dojo.connect(source, event, dest, event);
+       } else if (dojo.isArray(event) && event.length == 2) {
+         dojo.connect(source, event[0], dest, event[1]);
+       } else {
+         throw new Error("aiki.relay: Unsupported event descriptor: " + event);
+       }
      }
    };
 })(aiki);
