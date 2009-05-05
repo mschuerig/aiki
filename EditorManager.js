@@ -1,4 +1,5 @@
 dojo.provide('aiki.EditorManager');
+dojo.require('dojox.widget.Standby');
 dojo.require('aiki._base');
 
 dojo.declare('aiki.EditorManager', null, {
@@ -37,12 +38,14 @@ dojo.declare('aiki.EditorManager', null, {
   },
 
   _edit: function(object, store, widgetType, whenReady, options) {
-    var editor = this._editorForObject(object);
+    var editor = this._editorFor('object', object);
     if (!editor) {
       editor = this._makeEditor(object, store, widgetType, options);
-      dojo.connect(editor.widget, 'onReady', function() {
+
+      dojo.connect(editor.widget, 'onReady', dojo.hitch(this, function() {
+        this._stopStandby(editor);
         whenReady.callback(editor);
-      });
+      }));
     } else {
       whenReady.callback(editor);
     }
@@ -55,6 +58,7 @@ dojo.declare('aiki.EditorManager', null, {
   },
 
   editorClosed: function(widget) {
+    this._stopStandby(this._editorFor('widget', widget));
     this._editors = dojo.filter(this._editors, function(item) {
       return item.widget !== widget;
     });
@@ -84,7 +88,9 @@ dojo.declare('aiki.EditorManager', null, {
       updateTitle();
       dojo.connect(widget, 'onChange', updateTitle);
     }
-    return { object: object, widget: widget };
+
+    var standby = this._startStandby(widget);
+    return { object: object, widget: widget, standby: standby };
   },
 
   _makeOnCloseHandler: function(widget) {
@@ -100,9 +106,24 @@ dojo.declare('aiki.EditorManager', null, {
     }
   },
 
-  _editorForObject: function(object) {
+  _startStandby: function(widget) {
+    var standbyNode = dojo.create('div', {}, dojo.body());
+    var standby = new dojox.widget.Standby({ target: widget.domNode.parentNode }, standbyNode);
+    standby.show();
+    return standby;
+  },
+
+  _stopStandby: function(editor) {
+    console.debug('*** stop standby: ', editor); //### REMOVE
+    if (editor.standby) {
+      editor.standby.destroyRecursive();
+      delete editor.standby;
+    }
+  },
+
+  _editorFor: function(key, object) {
     return aiki.find(this._editors, function(item) {
-      return item.object === object;
+      return item[key] === object;
     });
   }
 });
