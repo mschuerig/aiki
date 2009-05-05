@@ -37,5 +37,4 @@ dojo.provide('aiki._base');
        dojo.connect(source, event, dest, event);
      }
    };
-
 })(aiki);
