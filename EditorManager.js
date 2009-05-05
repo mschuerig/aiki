@@ -5,9 +5,9 @@ dojo.declare('aiki.EditorManager', null, {
   // summary:
   //   Manage a list of objects and their associated editors.
   //
-  _editors: [],
 
   constructor: function(options) {
+    this._editors = [];
     if (options) {
       dojo.mixin(this, options);
     }
