@@ -7,6 +7,7 @@ dojo.declare('aiki._QueriedListMixin', null, {
     grid.attr('structure', props.gridStructure);
     grid.setSortInfo(props.sortInfo);
     grid.setQuery(props.query);
+    grid.attr('rowsPerPage', props.rowsPerPage);
     grid.attr('keepRows', props.keepRows);
     grid.setStore(props.store);
   },
