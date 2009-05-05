@@ -40,11 +40,13 @@ dojo.declare('aiki.EditorManager', null, {
     var editor = this._editorForObject(object);
     if (!editor) {
       editor = this._makeEditor(object, store, widgetType, options);
+      dojo.connect(editor.widget, 'onReady', function() {
+        whenReady.callback(editor);
+      });
+    } else {
+      whenReady.callback(editor);
     }
     this.selectEditor(editor);
-    whenReady.callback(editor);
-
-    return editor.widget;
   },
 
   selectEditor: function(editor) {

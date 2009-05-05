@@ -14,21 +14,15 @@ dojo.declare("aiki.api.Edit", aiki.api.View, {
   },
 
   onCreated: function() {
-    throw new Error('Unimplemented API: aiki.api.Edit.onCreated');
   },
   onSaved: function() {
-    throw new Error('Unimplemented API: aiki.api.Edit.onSaved');
   },
   onError: function() {
-    throw new Error('Unimplemented API: aiki.api.Edit.onError');
   },
   onChange: function() {
-    throw new Error('Unimplemented API: aiki.api.Edit.onChange');
   },
   onModified: function() {
-    throw new Error('Unimplemented API: aiki.api.Edit.onModified');
   },
   onReverted: function() {
-    throw new Error('Unimplemented API: aiki.api.Edit.onReverted');
   }
 });
