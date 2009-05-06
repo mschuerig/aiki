@@ -24,40 +24,40 @@ dojo.require('aiki.QueryParser');
      }
    };
 
-   doh.registerGroup("tests.QueryParser",
+   doh.registerGroup("aiki.tests.QueryParser",
      [
        function assignsPlainTextToDefaultAttribute(t) {
          t.assertQuery({ name:"abc def" },
-                       tests.QueryParser.parse('abc def'));
+                       aiki.tests.qp.parse('abc def'));
        },
 
        function assignsAttributedTextToAttribute(t) {
          t.assertQuery({ name:"abc def" },
-                       tests.QueryParser.parse('name:abc def'));
+                       aiki.tests.qp.parse('name:abc def'));
        },
 
        function assignsQuotedTextToAttributes(t) {
          t.assertQuery({ firstname:"abc", lastname:"def" },
-                       tests.QueryParser.parse('firstname:"abc" lastname:"def"'));
+                       aiki.tests.qp.parse('firstname:"abc" lastname:"def"'));
        },
 
        function assignsLeadingTextToDefaultAttribute(t) {
          t.assertQuery({ name:"abc", lastname:"def" },
-                       tests.QueryParser.parse('abc lastname:def'));
+                       aiki.tests.qp.parse('abc lastname:def'));
        },
 
        function assignsTrailingTextToDefaultAttribute(t) {
          t.assertQuery({ name:"abc", lastname:"def" },
-                       tests.QueryParser.parse('lastname:"def" abc'));
+                       aiki.tests.qp.parse('lastname:"def" abc'));
        },
 
        function assignsMiddlingTextToDefaultAttribute(t) {
          t.assertQuery({ name:"xyz", firstname:"abc", lastname:"def" },
-                       tests.QueryParser.parse('firstname:"abc" xyz lastname:def'));
+                       aiki.tests.qp.parse('firstname:"abc" xyz lastname:def'));
        }
      ],
      function setUp() {
-       tests.QueryParser = new aiki.QueryParser(attributes, defaultAttribute);
+       aiki.tests.qp = new aiki.QueryParser(attributes, defaultAttribute);
      }
    );
  })();

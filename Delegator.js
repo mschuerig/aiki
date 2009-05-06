@@ -27,7 +27,7 @@ aiki.Delegator = function(/*Object*/target /*, String|Array|Function ... */) {
   function delegate(method, toMethod) {
     toMethod = toMethod || method;
     if (dojo.isString(method)) {
-      if (dojo.indexOf(aiki.Delegator.excludedMethods, method) > -1) {
+      if (dojo.indexOf(aiki.Delegator.excludedMethods, method) == -1) {
         proto[method] = function() {
           var t = this[target];
           return t[toMethod].apply(t, arguments);
