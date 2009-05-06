@@ -1,4 +1,5 @@
 dojo.provide("aiki.api.Edit");
+dojo.require("aiki.api.View");
 
 dojo.declare("aiki.api.Edit", aiki.api.View, {
 
