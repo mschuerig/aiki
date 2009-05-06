@@ -21,10 +21,21 @@ dojo.declare('aiki.Form', [dijit.form.Form,
   },
 
   onPopulated: function(object) {
+    console.debug('*** FORM ON POPULATED'); //### REMOVE
     this.onChange();
     this.markUnmodified();
     this.resetSubmitButtons();
     this.watchForChanges();
+  },
+
+  onModified: function() {
+//    this.enableSubmitButtons();
+  },
+
+  onReverted: function() {
+//### TODO doesn't work well with mouse interaction.
+// When the cursor is still in a changed field, the submit button can't be clicked.
+//    this.disableSubmitButtons();
   },
 
   onSaved: function() {

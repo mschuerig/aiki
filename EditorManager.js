@@ -18,37 +18,40 @@ dojo.declare('aiki.EditorManager', null, {
 
   editObject: function(object, store, widgetType, /* Object? */options) {
     options = options || {};
-    var whenReady = new dojo.Deferred();
+    var editorReady = new dojo.Deferred();
     if (dojo.isString(object)) {
       store.fetchItemByIdentity({
         identity: object,
         scope: this,
-        onItem: function(item) { this._edit(item, store, widgetType, whenReady, options); }
+        onItem: function(item) { this._edit(item, store, widgetType, editorReady, options); }
       });
     } else {
-      this._edit(object, store, widgetType, whenReady, options);
+      this._edit(object, store, widgetType, editorReady, options);
     }
-    return whenReady;
+    return editorReady;
   },
 
   newObject: function(store, widgetType, options) {
-    var whenReady = new dojo.Deferred();
-    this._edit(null, store, widgetType, whenReady, options || {});
-    return whenReady;
+    var editorReady = new dojo.Deferred();
+    this._edit(null, store, widgetType, editorReady, options || {});
+    return editorReady;
   },
 
-  _edit: function(object, store, widgetType, whenReady, options) {
+  _edit: function(object, store, widgetType, editorReady, options) {
     var editor = this._editorFor('object', object);
+
     if (!editor) {
       editor = this._makeEditor(object, store, widgetType, options);
 
-      dojo.connect(editor.widget, 'onReady', dojo.hitch(this, function() {
+      editor.widget.whenReady(dojo.hitch(this, function() {
         this._stopStandby(editor);
-        whenReady.callback(editor);
       }));
-    } else {
-      whenReady.callback(editor);
     }
+
+    editor.widget.whenReady(function() {
+      editorReady.callback(editor);
+    });
+
     this.selectEditor(editor);
   },
 
@@ -67,8 +70,7 @@ dojo.declare('aiki.EditorManager', null, {
   _makeEditor: function(object, store, widgetType, options) {
     //### TODO keep widget options and our own apart
     widgetType = dojo.isString(widgetType) ? dojo.getObject(widgetType) : widgetType;
-    var widget = new widgetType(dojo.mixin(options,
-      { store: store, object: object }));
+    var widget = new widgetType(dojo.mixin(options, { store: store, object: object }));
 
     widget = dojo.mixin(widget, {
       showLabel: true,
@@ -76,9 +78,19 @@ dojo.declare('aiki.EditorManager', null, {
       onClose: this._makeOnCloseHandler(widget)
     });
     this.container.addChild(widget);
-    this._editors.push({object: object, widget: widget});
 
+    var standby = this._startStandby(widget);
+    var editor = { object: object, widget: widget, standby: standby };
+
+    this._makeTitleUpdater(editor);
+    this._editors.push(editor);
+
+    return editor;
+  },
+
+  _makeTitleUpdater: function(editor) {
     if (this.container.tablist) {
+      var widget = editor.widget;
       var tabButton = this.container.tablist.pane2button[widget];
       var updateTitle = function() {
         var title = widget.getTitle();
@@ -88,9 +100,6 @@ dojo.declare('aiki.EditorManager', null, {
       updateTitle();
       dojo.connect(widget, 'onChange', updateTitle);
     }
-
-    var standby = this._startStandby(widget);
-    return { object: object, widget: widget, standby: standby };
   },
 
   _makeOnCloseHandler: function(widget) {
@@ -114,8 +123,8 @@ dojo.declare('aiki.EditorManager', null, {
   },
 
   _stopStandby: function(editor) {
-    console.debug('*** stop standby: ', editor); //### REMOVE
     if (editor.standby) {
+      editor.standby.hide();
       editor.standby.destroyRecursive();
       delete editor.standby;
     }

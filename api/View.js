@@ -8,10 +8,11 @@ dojo.declare("aiki.api.View", null, {
 	};
   },
 
-  getTitle: function() {
-    throw new Error('Unimplemented API: aiki.api.View.getTitle');
+  whenReady: function(callback) {
+    throw new Error('Unimplemented API: aiki.api.View.whenReady');
   },
 
-  onReady: function() {
+  getTitle: function() {
+    throw new Error('Unimplemented API: aiki.api.View.getTitle');
   }
 });
