@@ -1,6 +1,6 @@
 dojo.provide('aiki.EditorManager');
-dojo.require('dojox.widget.Standby');
 dojo.require('aiki._base');
+dojo.require('aiki.Standby');
 
 dojo.declare('aiki.EditorManager', null, {
   // summary:
@@ -79,8 +79,11 @@ dojo.declare('aiki.EditorManager', null, {
     });
     this.container.addChild(widget);
 
-    var standby = this._startStandby(widget);
-    var editor = { object: object, widget: widget, standby: standby };
+    var editor = {
+      object: object,
+      widget: widget,
+      standby: this._startStandby(widget)
+    };
 
     this._makeTitleUpdater(editor);
     this._editors.push(editor);
@@ -115,24 +118,20 @@ dojo.declare('aiki.EditorManager', null, {
     }
   },
 
-  _startStandby: function(widget) {
-    var standbyNode = dojo.create('div', {}, dojo.body());
-    var standby = new dojox.widget.Standby({ target: widget.domNode.parentNode }, standbyNode);
-    standby.show();
-    return standby;
-  },
-
-  _stopStandby: function(editor) {
-    if (editor.standby) {
-      editor.standby.hide();
-      editor.standby.destroyRecursive();
-      delete editor.standby;
-    }
-  },
-
   _editorFor: function(key, object) {
     return aiki.find(this._editors, function(item) {
       return item[key] === object;
     });
+  },
+
+  _startStandby: function(widget) {
+    return new aiki.Standby(widget.domNode.parentNode);
+  },
+
+  _stopStandby: function(editor) {
+    if (editor.standby) {
+      editor.standby.stop();
+      delete editor.standby;
+    }
   }
 });
