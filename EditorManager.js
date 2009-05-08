@@ -97,6 +97,9 @@ dojo.declare('aiki.EditorManager', null, {
       var tabButton = this.container.tablist.pane2button[widget];
       var updateTitle = function() {
         var title = widget.getTitle();
+        if (widget.isModified()) {
+          title = '*' + title;
+        }
         widget.attr('title', title);
         tabButton.attr('label', title);
       };
