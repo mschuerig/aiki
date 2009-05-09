@@ -97,7 +97,7 @@ dojo.declare('aiki.EditorManager', null, {
       var tabButton = this.container.tablist.pane2button[widget];
 
       var titlePostProc = widget.getFeatures()['aiki.api.Edit'] ?
-        function(title) { return '*' + title; } :
+        function(title) { return widget.isModified() ? ('*' + title) : title; } :
         function(title) { return title; };
 
       var updateTitle = function() {
