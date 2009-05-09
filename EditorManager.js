@@ -100,7 +100,6 @@ dojo.declare('aiki.EditorManager', null, {
         if (widget.isModified()) {
           title = '*' + title;
         }
-        widget.attr('title', title);
         tabButton.attr('label', title);
       };
       updateTitle();
