@@ -95,11 +95,13 @@ dojo.declare('aiki.EditorManager', null, {
     if (this.container.tablist) {
       var widget = editor.widget;
       var tabButton = this.container.tablist.pane2button[widget];
+
+      var titlePostProc = widget.getFeatures()['aiki.api.Edit'] ?
+        function(title) { return '*' + title; } :
+        function(title) { return title; };
+
       var updateTitle = function() {
-        var title = widget.getTitle();
-        if (widget.isModified()) {
-          title = '*' + title;
-        }
+        var title = titlePostProc(widget.getTitle());
         tabButton.attr('label', title);
       };
       updateTitle();
