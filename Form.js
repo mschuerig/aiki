@@ -22,7 +22,6 @@ dojo.declare('aiki.Form', [dijit.form.Form,
 
   onPopulated: function(object) {
     console.debug('*** FORM ON POPULATED'); //### REMOVE
-    this.onChange();
     this.markUnmodified();
     this.resetSubmitButtons();
     this.watchForChanges();
