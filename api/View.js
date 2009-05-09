@@ -12,6 +12,10 @@ dojo.declare("aiki.api.View", null, {
     throw new Error('Unimplemented API: aiki.api.View.whenReady');
   },
 
+  isReady: function() {
+    throw new Error('Unimplemented API: aiki.api.View.isReady');
+  },
+
   getTitle: function() {
     throw new Error('Unimplemented API: aiki.api.View.getTitle');
   }
