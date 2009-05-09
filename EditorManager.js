@@ -23,7 +23,8 @@ dojo.declare('aiki.EditorManager', null, {
       store.fetchItemByIdentity({
         identity: object,
         scope: this,
-        onItem: function(item) { this._edit(item, store, widgetType, editorReady, options); }
+        onItem: function(item) { this._edit(item, store, widgetType, editorReady, options); },
+        onError: function(err) { console.error(err); } //###
       });
     } else {
       this._edit(object, store, widgetType, editorReady, options);
@@ -78,6 +79,7 @@ dojo.declare('aiki.EditorManager', null, {
       onClose: this._makeOnCloseHandler(widget)
     });
     this.container.addChild(widget);
+    this._makeTitleUpdater(widget);
 
     var editor = {
       object: object,
@@ -85,15 +87,13 @@ dojo.declare('aiki.EditorManager', null, {
       standby: this._startStandby(widget)
     };
 
-    this._makeTitleUpdater(editor);
     this._editors.push(editor);
 
     return editor;
   },
 
-  _makeTitleUpdater: function(editor) {
+  _makeTitleUpdater: function(widget) {
     if (this.container.tablist) {
-      var widget = editor.widget;
       var tabButton = this.container.tablist.pane2button[widget];
 
       var titlePostProc = widget.getFeatures()['aiki.api.Edit'] ?
@@ -101,10 +101,13 @@ dojo.declare('aiki.EditorManager', null, {
         function(title) { return title; };
 
       var updateTitle = function() {
-        var title = titlePostProc(widget.getTitle());
+        var title = widget.isReady() ? titlePostProc(widget.getTitle()) : widget.loadingLabel;
         tabButton.attr('label', title);
       };
+
       updateTitle();
+
+      widget.whenReady(updateTitle);
       dojo.connect(widget, 'onChange', updateTitle);
     }
   },
