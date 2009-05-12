@@ -1,21 +1,24 @@
 dojo.provide('aiki.SortedList');
 dojo.require('dijit._Templated');
 dojo.require('dijit._Widget');
+dojo.require('aiki._SortedList.Item');
 
 dojo.declare('aiki.SortedList', [dijit._Widget, dijit._Templated], {
-  baseClass: 'moviedbAwardView',
+  baseClass: 'aikiSortedList',
   templatePath: dojo.moduleUrl('aiki', '_SortedList/SortedList.html'),
+  _multiValue: true,
 
   itemWidget: null,
+  name: '',
+  value: [],
   sortBy: [],
-  items: [],
 
   postCreate: function() {
     this._render();
   },
 
-  _setItemsAttr: function(items) {
-    this.items = items;
+  _setValueAttr: function(value) {
+    this.value = value;
     if (this._started) {
       this._render();
     }
@@ -31,20 +34,30 @@ dojo.declare('aiki.SortedList', [dijit._Widget, dijit._Templated], {
   },
 
   removeItem: function(item) {
-
+    var itemAndObject = aiki.find(this._items, function(it) { return it.item === item; });
+    if (itemAndObject) {
+      itemAndObject.item.destroyRecursive();
+      var object = itemAndObject.object;
+      this._items = dojo.filter(this._items, function(it) { return it.item !== item; });
+      this.value  = dojo.filter(this.value,  function(it) { return it !== object; });
+    }
   },
 
   _render: function() {
-    if (this.items) {
-      this.items = this.items.sort(this._sorter);
+    if (this.value) {
+      this._items = [];
+      this.value = this.value.sort(this._sorter);
 
-      dojo.forEach(this.items, function(item){
-        var listItem = dojo.create('li');
+      dojo.forEach(this.value, function(object){
         var content = new this.itemWidget({
-          item: item
+          item: object
         });
-        dojo.place(listItem, this.containerNode);
-        dojo.place(content.domNode, listItem);
+        var listItem = new aiki._SortedList.Item({
+          container: this,
+          content: content.domNode
+        });
+        this._items.push({ item: listItem, object: object });
+        dojo.place(listItem.domNode, this.containerNode);
       }, this);
     }
   },

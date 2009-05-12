@@ -1,0 +1,14 @@
+
+
+.aikiSortedListItem .aikiSortedListItemRemoveButton {
+  display: none;
+  width: 32px;
+  height: 32px;
+  margin-left: 1em;
+  background: url(remove.png) center center no-repeat;
+}
+
+.aikiSortedListItem:hover .aikiSortedListItemRemoveButton {
+  display: inline-block;
+  display: -moz-inline-box;
+}
