@@ -3,6 +3,7 @@ dojo.require('dijit._Templated');
 dojo.require('dijit._Widget');
 dojo.require('aiki._SortedList.Item');
 
+//### TODO store-backed, take Notification API into account
 dojo.declare('aiki.SortedList', [dijit._Widget, dijit._Templated], {
   baseClass: 'aikiSortedList',
   templatePath: dojo.moduleUrl('aiki', '_SortedList/SortedList.html'),
@@ -11,7 +12,7 @@ dojo.declare('aiki.SortedList', [dijit._Widget, dijit._Templated], {
   itemWidget: null,
   name: '',
   value: [],
-  sortBy: [],
+  sortBy: [], //### TODO this should really be a function to enable item opacity
 
   postCreate: function() {
     this._render();

@@ -14,6 +14,8 @@ dojo.declare('aiki.EditorManager', null, {
     }
     this.container = dijit.byId(this.container);
     dojo.subscribe(this.container.id + '-removeChild', this, 'editorClosed');
+    
+    this.actions = dojo.hitch(this, 'getActions');
   },
 
   editObject: function(object, store, widgetType, /* Object? */options) {
@@ -36,6 +38,19 @@ dojo.declare('aiki.EditorManager', null, {
     var editorReady = new dojo.Deferred();
     this._edit(null, store, widgetType, editorReady, options || {});
     return editorReady;
+  },
+
+  getCurrentEditor: function() {
+    return this.container.selectedChildWidget;
+  },
+
+  getActions: function(context) {
+    var editor = this.getCurrentEditor();
+    if (editor && editor.getFeatures()['aiki.api.Actions']) {
+      return editor.getActions(context);
+    } else {
+      return [];
+    }
   },
 
   _edit: function(object, store, widgetType, editorReady, options) {

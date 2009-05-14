@@ -3,9 +3,9 @@ dojo.provide("aiki.api.View");
 dojo.declare("aiki.api.View", null, {
 
   getFeatures: function(){
-	return {
-	  "aiki.api.View": true
-	};
+    return {
+      "aiki.api.View": true
+    };
   },
 
   whenReady: function(callback) {

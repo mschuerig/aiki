@@ -4,10 +4,10 @@ dojo.require("aiki.api.View");
 dojo.declare("aiki.api.Edit", aiki.api.View, {
 
   getFeatures: function(){
-	return {
-	  "aiki.api.View": true,
-	  "aiki.api.Edit": true
-	};
+    return {
+      "aiki.api.View": true,
+      "aiki.api.Edit": true
+    };
   },
 
   isModified: function() {
