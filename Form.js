@@ -40,6 +40,7 @@ dojo.declare('aiki.Form', [dijit.form.Form,
   onSaved: function() {
     this.markUnmodified();
     this.resetSubmitButtons();
+    this.onChange();
   },
 
   onError: function() {
