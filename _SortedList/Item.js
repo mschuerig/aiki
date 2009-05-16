@@ -11,17 +11,17 @@ dojo.declare('aiki._SortedList.Item', [dijit._Widget, dijit._Templated], {
 
   container: null,
   content: null,
-  
+
   postMixInProperties: function() {
     this.removeIconClass = this.baseClass + 'RemoveButton';
   },
-  
+
   postCreate: function() {
     dojo.connect(this.removeButtonNode, 'onClick', console.warn); //###
     dojo.connect(this.removeButtonNode, 'onClick',
       dojo.hitch(this.container, 'removeItem', this));
   },
-  
+
   _setContentAttr: function(content) {
     dojo.html.set(this.contentNode, content);
   }

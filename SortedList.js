@@ -19,10 +19,11 @@ dojo.declare('aiki.SortedList', [dijit._Widget, dijit._Templated], {
   },
 
   _setValueAttr: function(value) {
-    this.value = value;
-    if (this._started) {
-      this._render();
+    this.value = [];
+    for (var i = 0, l = value.length; i < l; i++) {
+      this.value.push(value[i]);
     }
+    this._render();
   },
 
   _setSortByAttr: function(sortBy) {
@@ -30,23 +31,59 @@ dojo.declare('aiki.SortedList', [dijit._Widget, dijit._Templated], {
     this._sorter = this._buildSorter(sortBy);
   },
 
-  addItem: function(item) {
 
+  hasObject: function(object) {
+    return !!this._findByObject(object);
+  },
+
+  addObject: function(object) {
+    this.value.push(object);
+    this._render();
+    this._onObjectAdded(object, this._findByObject(object).item);
+  },
+
+  removeObject: function(object) {
+    this._removeListItem(this._findByObject(object));
   },
 
   removeItem: function(item) {
-    var itemAndObject = aiki.find(this._items, function(it) { return it.item === item; });
+    this._removeListItem(this._findByItem(item));
+  },
+
+  onObjectAdded: function(object, item) {
+  },
+
+  onObjectRemoved: function(object) {
+  },
+
+  onChange: function() {
+  },
+
+  _onObjectAdded: function(object, item) {
+    this.onObjectAdded(object, item);
+    this.onChange();
+  },
+
+  _onObjectRemoved: function(object) {
+    this.onObjectRemoved(object);
+    this.onChange();
+  },
+
+  _removeListItem: function(itemAndObject) {
     if (itemAndObject) {
       itemAndObject.item.destroyRecursive();
+      var item   = itemAndObject.item;
       var object = itemAndObject.object;
       this._items = dojo.filter(this._items, function(it) { return it.item !== item; });
       this.value  = dojo.filter(this.value,  function(it) { return it !== object; });
+      this._onObjectRemoved(object);
     }
   },
 
   _render: function() {
-    if (this.value) {
+    if (this._started && this.value) {
       this._items = [];
+      this.destroyDescendants();
       this.value = this.value.sort(this._sorter);
 
       dojo.forEach(this.value, function(object){
@@ -61,6 +98,14 @@ dojo.declare('aiki.SortedList', [dijit._Widget, dijit._Templated], {
         dojo.place(listItem.domNode, this.containerNode);
       }, this);
     }
+  },
+
+  _findByItem: function(item) {
+    return aiki.find(this._items, function(it) { return it.item === item; });
+  },
+
+  _findByObject: function(object) {
+    return aiki.find(this._items, function(it) { return it.object === object; });
   },
 
   _buildSorter: function(sortBy) {

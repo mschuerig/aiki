@@ -14,7 +14,7 @@ dojo.declare('aiki.EditorManager', null, {
     }
     this.container = dijit.byId(this.container);
     dojo.subscribe(this.container.id + '-removeChild', this, 'editorClosed');
-    
+
     this.actions = dojo.hitch(this, 'getActions');
   },
 
