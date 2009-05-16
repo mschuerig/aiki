@@ -1,12 +1,19 @@
 dojo.provide('aiki.SortedList');
-dojo.require('dijit._Templated');
-dojo.require('dijit._Widget');
+dojo.require('dijit.form._FormWidget');
+dojo.require('aiki.array');
 dojo.require('aiki._SortedList.Item');
 
 //### TODO store-backed, take Notification API into account
-dojo.declare('aiki.SortedList', [dijit._Widget, dijit._Templated], {
+dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
   baseClass: 'aikiSortedList',
+
   templatePath: dojo.moduleUrl('aiki', '_SortedList/SortedList.html'),
+
+  attributeMap: dojo.delegate(dijit.form._FormWidget.prototype.attributeMap, {
+    size: "focusNode"
+  }),
+
+  scrollOnFocus: false,
   _multiValue: true,
 
   itemWidget: null,
@@ -14,16 +21,17 @@ dojo.declare('aiki.SortedList', [dijit._Widget, dijit._Templated], {
   value: [],
   sortBy: [], //### TODO this should really be a function to enable item opacity
 
-  postCreate: function() {
+  _setValueAttr: function(value, priorityChange) {
+    var objects = aiki.array.dup(value); //### FIXME don't set _objects
+    if (this._sorter) {
+      objects.sort(this._sorter);
+    }
+    this._handleOnChange(objects, priorityChange);
     this._render();
   },
-
-  _setValueAttr: function(value) {
-    this.value = [];
-    for (var i = 0, l = value.length; i < l; i++) {
-      this.value.push(value[i]);
-    }
-    this._render();
+  
+  _getValueAttr: function(){
+    return this._lastValue;
   },
 
   _setSortByAttr: function(sortBy) {
@@ -31,44 +39,52 @@ dojo.declare('aiki.SortedList', [dijit._Widget, dijit._Templated], {
     this._sorter = this._buildSorter(sortBy);
   },
 
+  compare: function(val1, val2) {
+    var l1 = val1.length, l2 = val2.length;
+    if (l1 < l2) {
+      return -1;
+    }
+    if (l1 > l2) {
+      return 1;
+    }
+    for (var i = 0; i < l1; i++) {
+      var cmp = this._compareObjects(val1[i], val2[2]);
+      if (cmp != 0) {
+        return cmp;
+      }
+    }
+    return 0;
+  },
 
   hasObject: function(object) {
     return !!this._findByObject(object);
   },
 
   addObject: function(object) {
-    this.value.push(object);
-    this._render();
-    this._onObjectAdded(object, this._findByObject(object).item);
+    var objects = aiki.array.dup(this.attr('value'));
+    objects.push(object);
+    this.attr('value', objects);
+    this.onObjectAdded(object, this._findByObject(object).item);
   },
 
   removeObject: function(object) {
-    this._removeListItem(this._findByObject(object));
+    var objects = aiki.array.dup(this.attr('value'));
+    var oldLen = objects.length;
+    objects = dojo.filter(objects, function(obj) { return obj !== object; });
+    if (objects.length < oldLen) {
+      this.attr('value', objects);
+      this.onObjectRemoved(object);
+    }
   },
 
   removeItem: function(item) {
-    this._removeListItem(this._findByItem(item));
+    var itemAndObject = this._findByItem(item);
+    if (itemAndObject) {
+      this.removeObject(itemAndObject.object);
+    }
   },
 
-  onObjectAdded: function(object, item) {
-  },
-
-  onObjectRemoved: function(object) {
-  },
-
-  onChange: function() {
-  },
-
-  _onObjectAdded: function(object, item) {
-    this.onObjectAdded(object, item);
-    this.onChange();
-  },
-
-  _onObjectRemoved: function(object) {
-    this.onObjectRemoved(object);
-    this.onChange();
-  },
-
+/*
   _removeListItem: function(itemAndObject) {
     if (itemAndObject) {
       itemAndObject.item.destroyRecursive();
@@ -76,17 +92,26 @@ dojo.declare('aiki.SortedList', [dijit._Widget, dijit._Templated], {
       var object = itemAndObject.object;
       this._items = dojo.filter(this._items, function(it) { return it.item !== item; });
       this.value  = dojo.filter(this.value,  function(it) { return it !== object; });
-      this._onObjectRemoved(object);
+      this.onObjectRemoved(object);
     }
+  },
+*/
+  onObjectAdded: function(object, item) {
+  },
+
+  onObjectRemoved: function(object) {
   },
 
   _render: function() {
-    if (this._started && this.value) {
+    if (!this._started) {
+      return;
+    }
+    var objects = this.attr('value');
+    if (objects) {
       this._items = [];
       this.destroyDescendants();
-      this.value = this.value.sort(this._sorter);
 
-      dojo.forEach(this.value, function(object){
+      dojo.forEach(objects, function(object){
         var content = new this.itemWidget({
           item: object
         });
@@ -106,6 +131,10 @@ dojo.declare('aiki.SortedList', [dijit._Widget, dijit._Templated], {
 
   _findByObject: function(object) {
     return aiki.find(this._items, function(it) { return it.object === object; });
+  },
+
+  _compareObjects: function(obj1, obj2) {
+    return obj1 === obj2 ? 0 : -1; // arbitrarily return -1 for unequal objects
   },
 
   _buildSorter: function(sortBy) {

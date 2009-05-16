@@ -1,14 +1,20 @@
 
-
-.aikiSortedListItem .aikiSortedListItemRemoveButton {
-  display: none;
-  width: 32px;
-  height: 32px;
-  margin-left: 1em;
-  background: url(remove.png) center center no-repeat;
+.aikiSortedListItem {
+  margin: 0;
+  padding: 0;
 }
 
-.aikiSortedListItem:hover .aikiSortedListItemRemoveButton {
-  display: inline-block;
-  display: -moz-inline-box;
+.aikiSortedListItem .aikiSortedListItemRemoveButton .dijitButtonNode {
+  visibility: hidden;
+  width: 20px;
+  height: 16px;
+  margin: 0 0 0 1em;
+  padding: 0;
+  border: 1px solid #ccc;
+  background-color: transparent;
+  background: url(list-remove.png) center center no-repeat;
+}
+
+.aikiSortedListItem:hover .aikiSortedListItemRemoveButton .dijitButtonNode {
+  visibility: visible;
 }

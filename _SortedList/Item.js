@@ -13,7 +13,7 @@ dojo.declare('aiki._SortedList.Item', [dijit._Widget, dijit._Templated], {
   content: null,
 
   postMixInProperties: function() {
-    this.removeIconClass = this.baseClass + 'RemoveButton';
+    this.removeButtonClass = this.baseClass + 'RemoveButton';
   },
 
   postCreate: function() {
