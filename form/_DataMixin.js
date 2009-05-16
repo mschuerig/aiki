@@ -71,10 +71,14 @@ dojo.declare('aiki.form._DataMixin', null, {
         var propModified;
         var orig = originalValue(prop) || '';
         var cur = values[prop] || ''; //### TODO is '' ever used?
-        if (orig instanceof Date || cur instanceof Date) {
+        if (dojo.isString(orig) && dojo.isString(cur)) {
+          propModified = (orig !== cur);
+        } else if (orig instanceof Date || cur instanceof Date) {
           propModified = (dojo.date.compare(orig, cur) !== 0);
         } else {
-          propModified = orig.toString() != cur.toString();
+          var a = dojo.toJson(orig);
+          var b = dojo.toJson(cur);
+          propModified = (a !== b);
         }
         if (propModified && dojo.config.isDebug) {
           console.debug('modified property: ', prop, "\noriginal value: ", orig, "\ncurrent value: ", cur);
