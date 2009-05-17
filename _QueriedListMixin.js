@@ -12,15 +12,22 @@ dojo.declare('aiki._QueriedListMixin', null, {
     grid.setStore(props.store);
   },
 
-  _connectEvents: function(grid, newItemNode, kind) {
-    dojo.connect(newItemNode, 'onSubmit', function(event) {
-      dojo.stopEvent(event);
-      dojo.publish(kind + '.new');
-    });
-
+  _connectGridTopics: function(kind, grid) {
     dojo.connect(grid, 'onRowDblClick', function(event) {
       dojo.publish(kind + '.selected', [grid.getItem(event.rowIndex)]);
     });
+  },
+
+  _connectButtonTopics: function(kind, buttons) {
+    for (var action in buttons) {
+      var button = buttons[action];
+      if (button) {
+        dojo.connect(button, 'onSubmit', function(event) {
+          dojo.stopEvent(event);
+          dojo.publish(kind + '.' + action);
+        });
+      }
+    }
   },
 
   _connectQuerying: function(grid, queryForm, queryField, allowedAttributes, defaultAttribute) {
@@ -38,6 +45,24 @@ dojo.declare('aiki._QueriedListMixin', null, {
         queryForm.resetSubmitButtons();
       });
     }
+  },
+
+  _gridTooltips: function(grid, messageCallback) {
+    var showTooltip = function(e) {
+      var item = e.grid.getItem(e.rowIndex);
+      if (item) {
+        var msg = messageCallback(item);
+        if (msg) {
+          dijit.showTooltip(msg, e.cellNode);
+        }
+      }
+    };
+    var hideTooltip = function(e) {
+      dijit.hideTooltip(e.cellNode);
+      dijit._masterTT._onDeck=null;
+    };
+    dojo.connect(grid, "onCellMouseOver", showTooltip);
+    dojo.connect(grid, "onCellMouseOut", hideTooltip);
   },
 
   _makeQueryFieldTooltip: function(fieldWidget, attributes, defaultAttribute) {
