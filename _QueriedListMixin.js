@@ -22,10 +22,12 @@ dojo.declare('aiki._QueriedListMixin', null, {
     for (var action in buttons) {
       var button = buttons[action];
       if (button) {
-        dojo.connect(button, 'onSubmit', function(event) {
-          dojo.stopEvent(event);
-          dojo.publish(kind + '.' + action);
-        });
+        (function(action) {
+          dojo.connect(button, 'onSubmit', function(event) {
+            dojo.stopEvent(event);
+            dojo.publish(kind + '.' + action);
+          });
+        })(action);
       }
     }
   },
