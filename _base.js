@@ -59,4 +59,8 @@ dojo.provide('aiki._base');
       }
     }).play();
   };
+
+  dojo.declare('aiki._EmptyClass', null, {});
+  a.emptyObject = new aiki._EmptyClass();
+
 })(aiki);

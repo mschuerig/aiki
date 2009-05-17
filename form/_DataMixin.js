@@ -27,14 +27,15 @@ dojo.declare('aiki.form._DataMixin', null, {
 
   save: function() {
     var onComplete;
-    if (this.object) {
+    var newItem;
+    if (this.object && this.store.isItem(this.object)) {
       onComplete = this.onSaved;
       this._writeBackValues(dojo.hitch(this, function(prop, value) {
         this.store.setValue(this.object, prop, value);
       }));
     } else {
       onComplete = dojo.hitch(this, function() { this.onCreated(); this.onSaved(); }); //### TODO pass through args
-      var newItem = {};
+      newItem = {};
       this._writeBackValues(function(prop, value) {
         newItem[prop] = value;
       });
@@ -42,19 +43,31 @@ dojo.declare('aiki.form._DataMixin', null, {
     }
     this.store.save({
       onComplete: onComplete,
-      onError: this.onError,
+      onError: dojo.hitch(this, '_onError', newItem),
       scope: this
     });
   },
 
+  _onError: function(newItem, err) {
+    if (newItem) { //### FIXME this does not work
+//      this.store.deleteItem(newItem);
+    }
+    this.onError(err);
+  },
+
   _writeBackValues: function(setter) {
+//    var empty = aiki.emptyObject;
     var values = this.attr('value');
     for (var prop in values) {
-      var value = values[prop];
-      if (dojo.config.isDebug) {
-        console.debug('Setting value for ', prop, ' to ', value);
-      }
-      setter(prop, value);
+//      if (!(prop in empty)) {
+        var value = values[prop];
+//        if (!dojo.isFunction(value)) {
+          if (dojo.config.isDebug) {
+            console.debug('Setting value for ', prop, ' to ', value);
+          }
+          setter(prop, value);
+//        }
+//      }
     }
   },
 

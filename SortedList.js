@@ -29,7 +29,7 @@ dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
     this._handleOnChange(objects, priorityChange);
     this._render();
   },
-  
+
   _getValueAttr: function(){
     return this._lastValue;
   },
