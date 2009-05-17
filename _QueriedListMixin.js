@@ -53,7 +53,7 @@ dojo.declare('aiki._QueriedListMixin', null, {
     var showTooltip = function(e) {
       var item = e.grid.getItem(e.rowIndex);
       if (item) {
-        var msg = messageCallback(item);
+        var msg = messageCallback(item, e);
         if (msg) {
           dijit.showTooltip(msg, e.cellNode);
         }
