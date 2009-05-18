@@ -23,15 +23,12 @@ dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
 
   _setValueAttr: function(value, priorityChange) {
     var objects = aiki.array.dup(value); //### FIXME don't set _objects
-    if (this._sorter) {
-      objects.sort(this._sorter);
-    }
     this._handleOnChange(objects, priorityChange);
     this._render();
   },
 
   _getValueAttr: function(){
-    return this._lastValue;
+    return this._lastValue ? aiki.array.dup(this._lastValue) : null;
   },
 
   _setSortByAttr: function(sortBy) {
@@ -84,18 +81,6 @@ dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
     }
   },
 
-/*
-  _removeListItem: function(itemAndObject) {
-    if (itemAndObject) {
-      itemAndObject.item.destroyRecursive();
-      var item   = itemAndObject.item;
-      var object = itemAndObject.object;
-      this._items = dojo.filter(this._items, function(it) { return it.item !== item; });
-      this.value  = dojo.filter(this.value,  function(it) { return it !== object; });
-      this.onObjectRemoved(object);
-    }
-  },
-*/
   onObjectAdded: function(object, item) {
   },
 
@@ -108,6 +93,9 @@ dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
     }
     var objects = this.attr('value');
     if (objects) {
+      if (this._sorter) {
+        objects.sort(this._sorter);
+      }
       this._items = [];
       this.destroyDescendants();
 
