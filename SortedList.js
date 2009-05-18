@@ -16,10 +16,11 @@ dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
   scrollOnFocus: false,
   _multiValue: true,
 
-  itemWidget: null,
   name: '',
+  store: null,
+  itemWidget: null,
   value: [],
-  sortBy: [], //### TODO this should really be a function to enable item opacity
+  sortBy: [],
 
   _setValueAttr: function(value, priorityChange) {
     var objects = aiki.array.dup(value); //### FIXME don't set _objects
@@ -33,7 +34,8 @@ dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
 
   _setSortByAttr: function(sortBy) {
     this.sortBy = sortBy;
-    this._sorter = this._buildSorter(sortBy);
+    this._sorter = null;
+    this._render();
   },
 
   compare: function(val1, val2) {
@@ -93,14 +95,13 @@ dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
     }
     var objects = this.attr('value');
     if (objects) {
-      if (this._sorter) {
-        objects.sort(this._sorter);
-      }
+      objects.sort(this._getSorter());
       this._items = [];
       this.destroyDescendants();
 
       dojo.forEach(objects, function(object){
         var content = new this.itemWidget({
+          store: this.store,
           item: object
         });
         var listItem = new aiki._SortedList.Item({
@@ -125,17 +126,30 @@ dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
     return obj1 === obj2 ? 0 : -1; // arbitrarily return -1 for unequal objects
   },
 
+  _getSorter: function() {
+    if (!this._sorter) {
+      this._sorter = this.sortBy ?
+        dojo.hitch(this, this._buildSorter(this.sortBy)) :
+        function(a, b) { return 0; };
+    }
+    return this._sorter;
+  },
+
   _buildSorter: function(sortBy) {
+    var attrAccess = this.store ?
+      function(item, attr) { return 'this.store.getValue(' + item + ',"' + attr + '")'; } :
+      function(item, attr) { return item + '.' + attr; };
+
     var comparisons = dojo.map(sortBy, function(attr) {
       switch (attr[0]) {
         case '/':
           attr = attr.substring(1);
-          return { a: 'a.' + attr, b: 'b.' + attr };
+          return { a: attrAccess('a', attr), b: attrAccess('b', attr) };
         case '\\':
           attr = attr.substring(1);
-          return { a: 'b.' + attr, b: 'a.' + attr };
+          return { a: attrAccess('b', attr), b: attrAccess('a', attr) };
         default:
-          return { a: 'a.' + attr, b: 'b.' + attr };
+          return { a: attrAccess('a', attr), b: attrAccess('b', attr) };
       }
     });
 
