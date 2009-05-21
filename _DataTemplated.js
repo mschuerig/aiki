@@ -19,17 +19,24 @@ dojo.declare('aiki._DataTemplated', dijit._Templated, {
   },
   
   _getStoreObject: function(name, create, context) {
-    var store = context.store;
-    var parts = name.split('.');
-    var value = context[parts[0]];
-    for (var i = 1, l = parts.length; value && i < l; i++) {
-      var p = parts[i];
-      if (p === 'getIdentity') {
-        value = store.getIdentity ? store.getIdentity(value) : null;
-      } else {
-        value = store.getValue(value, p);
+    try {
+      var store = context.store;
+      var parts = name.split('.');
+      var value = context[parts[0]];
+      for (var i = 1, l = parts.length; value && i < l; i++) {
+        var p = parts[i];
+        if (p === 'getIdentity') {
+          value = context.store.getIdentity ?
+            context.store.getIdentity(value) :
+            null;
+        } else {
+          value = context.store.getValue(value, p);
+        }
       }
+      return value;
+    } catch (e) {
+      console.error('aiki._DataTemplated._getStoreObject', e, name, context);
+      throw e;
     }
-    return value;
   }
 });

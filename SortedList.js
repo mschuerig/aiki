@@ -136,6 +136,8 @@ dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
   },
 
   _buildSorter: function(sortBy) {
+    //### TODO compare & constrast dojo.data.util.sorter
+    //### TODO accept attribute paths
     var attrAccess = this.store ?
       function(item, attr) { return 'this.store.getValue(' + item + ',"' + attr + '")'; } :
       function(item, attr) { return item + '.' + attr; };
