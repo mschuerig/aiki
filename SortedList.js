@@ -1,6 +1,7 @@
 dojo.provide('aiki.SortedList');
 dojo.require('dijit.form._FormWidget');
 dojo.require('aiki.array');
+dojo.require('aiki.data');
 dojo.require('aiki._SortedList.Item');
 
 //### TODO store-backed, take Notification API into account
@@ -8,6 +9,7 @@ dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
   baseClass: 'aikiSortedList',
 
   templatePath: dojo.moduleUrl('aiki', '_SortedList/SortedList.html'),
+  itemWidget: aiki._SortedList.Item,
 
   attributeMap: dojo.delegate(dijit.form._FormWidget.prototype.attributeMap, {
     size: "focusNode"
@@ -18,9 +20,9 @@ dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
 
   name: '',
   store: null,
-  itemWidget: null,
+  contentWidget: null,
   value: [],
-  sortBy: [],
+  sortBy: null,
 
   _setValueAttr: function(value, priorityChange) {
     var objects = aiki.array.dup(value); //### FIXME don't set _objects
@@ -34,7 +36,7 @@ dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
 
   _setSortByAttr: function(sortBy) {
     this.sortBy = sortBy;
-    this._sorter = null;
+    this._comparator = null;
     this._render();
   },
 
@@ -95,21 +97,22 @@ dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
     }
     var objects = this.attr('value');
     if (objects) {
-      objects.sort(this._getSorter());
+      objects.sort(this._getComparator());
       this._items = [];
       this.destroyDescendants();
 
-      dojo.forEach(objects, function(object){
-        var content = new this.itemWidget({
+      dojo.forEach(objects, function(object, index){
+        var content = new this.contentWidget({
           store: this.store,
           item: object
         });
-        var listItem = new aiki._SortedList.Item({
+        var listItem = new this.itemWidget({
           container: this,
-          content: content.domNode
+          content: content.domNode,
+          index: index
         });
         this._items.push({ item: listItem, object: object });
-        dojo.place(listItem.domNode, this.containerNode);
+        dojo.place(listItem.domNode, this.listNode);
       }, this);
     }
   },
@@ -126,35 +129,32 @@ dojo.declare('aiki.SortedList', dijit.form._FormWidget, {
     return obj1 === obj2 ? 0 : -1; // arbitrarily return -1 for unequal objects
   },
 
-  _getSorter: function() {
-    if (!this._sorter) {
-      this._sorter = this.sortBy ?
-        dojo.hitch(this, this._buildSorter(this.sortBy)) :
+  _getComparator: function() {
+    if (!this._comparator) {
+      this._comparator = this.sortBy ?
+        dojo.hitch(this, this._buildComparator(this.sortBy)) :
         function(a, b) { return 0; };
     }
-    return this._sorter;
+    return this._comparator;
   },
 
-  _buildSorter: function(sortBy) {
+  _buildComparator: function(sortBy) {
     //### TODO compare & constrast dojo.data.util.sorter
-    //### TODO accept attribute paths
+    if (dojo.isFunction(sortBy)) {
+      return sortBy;
+    }
+    if (!dojo.isArray(sortBy)) {
+      sortBy = [sortBy];
+    }
     var attrAccess = this.store ?
-      function(item, attr) { return 'this.store.getValue(' + item + ',"' + attr + '")'; } :
+      function(item, attr) { return 'aiki.data.lookupValue(this.store,' + item + ',"' + attr + '")'; } :
       function(item, attr) { return item + '.' + attr; };
 
-    var comparisons = dojo.map(sortBy, function(attr) {
-      switch (attr[0]) {
-        case '/':
-          attr = attr.substring(1);
-          return { a: attrAccess('a', attr), b: attrAccess('b', attr) };
-        case '\\':
-          attr = attr.substring(1);
-          return { a: attrAccess('b', attr), b: attrAccess('a', attr) };
-        default:
-          return { a: attrAccess('a', attr), b: attrAccess('b', attr) };
-      }
+    var comparisons = dojo.map(sortBy, function(spec) {
+      var a = attrAccess('a', spec.attribute);
+      var b = attrAccess('b', spec.attribute);
+      return spec.descending ? { a: b, b: a } : { a: a, b: b };
     });
-
     var tests = dojo.map(comparisons, function(cmp) {
       return dojo.string.substitute("d = (${a} || '').localeCompare(${b});", cmp)
         + "if (d !== 0) { return d; }"

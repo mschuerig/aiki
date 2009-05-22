@@ -1,5 +1,6 @@
 dojo.provide('aiki._DataTemplated');
 dojo.require('dijit._Templated');
+dojo.require('aiki.data');
 
 dojo.declare('aiki._DataTemplated', dijit._Templated, {
   store: null,
@@ -20,20 +21,9 @@ dojo.declare('aiki._DataTemplated', dijit._Templated, {
   
   _getStoreObject: function(name, create, context) {
     try {
-      var store = context.store;
       var parts = name.split('.');
-      var value = context[parts[0]];
-      for (var i = 1, l = parts.length; value && i < l; i++) {
-        var p = parts[i];
-        if (p === 'getIdentity') {
-          value = context.store.getIdentity ?
-            context.store.getIdentity(value) :
-            null;
-        } else {
-          value = context.store.getValue(value, p);
-        }
-      }
-      return value;
+      var item = context[parts.shift()];
+      return aiki.data.lookupValue(context.store, item, parts)
     } catch (e) {
       console.error('aiki._DataTemplated._getStoreObject', e, name, context);
       throw e;

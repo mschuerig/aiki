@@ -7,9 +7,9 @@ dojo.require('dijit.form.Button');
 dojo.requireLocalization('aiki', 'common');
 
 dojo.declare('aiki._SortedList.Item', [dijit._Widget, dijit._Templated], {
-  //### i18n for label/title
   baseClass: 'aikiSortedListItem',
   templatePath: dojo.moduleUrl('aiki', '_SortedList/Item.html'),
+  childrenOnly: false,
   widgetsInTemplate: true,
 
   container: null,
@@ -21,7 +21,6 @@ dojo.declare('aiki._SortedList.Item', [dijit._Widget, dijit._Templated], {
   },
 
   postCreate: function() {
-    dojo.connect(this.removeButtonNode, 'onClick', console.warn); //###
     dojo.connect(this.removeButtonNode, 'onClick',
       dojo.hitch(this.container, 'removeItem', this));
   },
