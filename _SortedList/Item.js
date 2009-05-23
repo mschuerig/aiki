@@ -9,7 +9,6 @@ dojo.requireLocalization('aiki', 'common');
 dojo.declare('aiki._SortedList.Item', [dijit._Widget, dijit._Templated], {
   baseClass: 'aikiSortedListItem',
   templatePath: dojo.moduleUrl('aiki', '_SortedList/Item.html'),
-  childrenOnly: false,
   widgetsInTemplate: true,
 
   container: null,
@@ -26,6 +25,15 @@ dojo.declare('aiki._SortedList.Item', [dijit._Widget, dijit._Templated], {
   },
 
   _setContentAttr: function(content) {
-    dojo.html.set(this.contentNode, content);
+    if (this.afterContentChildrenNode) {
+      while (this.contentNode.firstChild != this.afterContentChildrenNode) {
+        dojo.destroy(this.contentNode.firstChild);
+      }
+      while (content.hasChildNodes()) {
+        this.contentNode.insertBefore(content.firstChild, this.afterContentChildrenNode);
+      }
+    } else {
+      dojo.html.set(this.contentNode, content);
+    }
   }
 });
