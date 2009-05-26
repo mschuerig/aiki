@@ -72,6 +72,8 @@ dojo.declare('aiki.form._DataMixin', null, {
   },
 
   isModified: function() {
+    //### TODO doesn't work with circular structures; JSON-serialization fails
+    return false; //###
     var store = this.store, object = this.object;
     var originalValue = this.object ?
       function(prop) { return store.getValue(object, prop); }
