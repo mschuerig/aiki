@@ -6,6 +6,7 @@ dojo.declare('aiki._SortedTable.Item', aiki._SortedList.Item, {
   templatePath: dojo.moduleUrl('aiki', '_SortedTable/Item.html'),
   
   postCreate: function() {
+    this.inherited(arguments);
     if (this.index % 2 == 1) {
       dojo.addClass(this.domNode, 'dojoxGridRowOdd');
     }
