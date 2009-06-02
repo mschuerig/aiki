@@ -1,17 +1,33 @@
 /* TODO extract commonalities with SortedList */
 
+.aikiSortedTable {
+  border-collapse: collapse;
+}
+
+.aikiSortedTable td,
+.aikiSortedTable th
+{
+  padding: 0 1em;
+  text-align: left;
+}
+
+.aikiSortedTable td.aikiSortedTableItemAction,
+.aikiSortedTable th.aikiSortedTableItemAction
+{
+  padding: 0;
+}
+
 .aikiSortedTableItem {
   margin: 0;
   padding: 0;
 }
 
-.aikiSortedTableItem .aikiSortedTableItemRemoveButton .dijitButtonNode {
+.aikiSortedTableItem .aikiSortedTableItemAction .dijitButtonNode {
   visibility: hidden;
   width: 20px;
   height: 16px;
-  margin: 0 0 0 1em;
+  margin: 0;
   padding: 0;
-  border: 1px solid #ccc;
   background-color: transparent;
   background: url(../_SortedList/list-remove.png) center center no-repeat;
 }

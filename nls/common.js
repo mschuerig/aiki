@@ -1,3 +1,4 @@
 {
+  editItem: 'Edit',
   removeItem: 'Remove'
 }
