@@ -46,7 +46,6 @@ dojo.declare('aiki._QueriedListMixin', null, {
 
   _connectQuerying: function(grid, queryForm, queryField, allowedAttributes, defaultAttribute) {
     var queryParser = new aiki.QueryParser(allowedAttributes, defaultAttribute);
-    this._makeQueryFieldTooltip(this.queryFieldNode, allowedAttributes, defaultAttribute);
 
     dojo.connect(queryForm, 'onSubmit', function(event) {
       dojo.stopEvent(event);
@@ -116,17 +115,12 @@ dojo.declare('aiki._QueriedListMixin', null, {
     dojo.connect(grid, "onCellMouseOut", hideTooltip);
   },
 
-  _makeQueryFieldTooltip: function(fieldWidget, attributes, defaultAttribute) {
+  _makeQueryHelp: function(helpNode, attributes, defaultAttribute) {
     var help = new aiki.QueryHelp({
       attributes: attributes,
       defaultAttribute: defaultAttribute
     });
-    help.render();
-    return new dijit.Tooltip({
-      connectId: [fieldWidget.domNode],
-      label: help.domNode.innerHTML,
-      position: ['below', 'above']
-    });
+    helpNode.attr('content', help);
   },
 
   _setActionsAttr: function(actions) {

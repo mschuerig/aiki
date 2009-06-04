@@ -1,4 +1,5 @@
 dojo.provide('aiki._SortedTable.Item');
+dojo.require('dijit.form.Button');
 dojo.require('aiki._SortedList.Item');
 
 dojo.declare('aiki._SortedTable.Item', aiki._SortedList.Item, {
